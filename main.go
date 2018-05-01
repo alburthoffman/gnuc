@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"./command"
 	"log"
+	"strings"
 )
 
 func main() {
@@ -38,7 +39,16 @@ func parseFlags() {
 		}
 		commandModule := os.Args[2]
 		if len(os.Args) == 3 {
-			cmdTmpl, err := command.Loadf(commandModule)
+			pwd, err := os.Getwd()
+			if err != nil {
+				log.Fatal("fail to get current working directory.")
+			}
+
+			tmplFile := strings.Replace(commandModule, ".", string(os.PathSeparator), 1)
+			tmplFile = strings.Join([]string{pwd, tmplFile}, string(os.PathSeparator))
+			tmplFile = strings.Join([]string{tmplFile, ".json"}, "")
+			log.Printf("using command file: %s", tmplFile)
+			cmdTmpl, err := command.Loadf(tmplFile)
 			if err != nil {
 				log.Fatal("error: ", err)
 			}

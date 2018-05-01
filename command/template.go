@@ -28,5 +28,5 @@ func Loadf(tmplfile string) (t *Tmpl, err error)  {
 }
 
 func (t *Tmpl) PrintUsage()  {
-	fmt.Printf("Usage: %s\nExample:%s\n", t.Metadata["usage"], t.Metadata["example"])
+	fmt.Printf("Usage:\n\t%s\nExample:\n\t%s\n", t.Metadata["usage"], t.Metadata["example"])
 }
