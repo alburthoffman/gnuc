@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "usage": "execute command in given host\n",
+    "example": "gnuc run execute.command -h host1,host2 -f hostfile -Dparams=\"pwd\" -Otimeout=20"
+  },
+  "defaults": {
+    "params": "pwd"
+  },
+  "headers": {
+    "content-type": "application/json"
+  },
+  "attributes": {
+    "protocol": "https",
+    "port": 19876,
+    "method": "POST",
+    "url": "/api/execute",
+    "body": {
+      "cmd": "${params}",
+      "${timeout}": 100
+    }
+  }
+}

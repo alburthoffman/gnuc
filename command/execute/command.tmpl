@@ -1,0 +1,17 @@
+[Metadata]
+usage=execute command in given host
+ POST /api/execute
+ gnuc run execute.command -h host1,host2 -Dparams="pwd"
+
+[Defaults]
+params=pwd
+
+[Headers]
+content-type=application/json
+
+[Attributes]
+protocol=https
+url=/api/execute
+port=19876
+method=POST
+body={"cmd": "${params}"}
