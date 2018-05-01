@@ -4,6 +4,8 @@ import (
 	"flag"
 	"os"
 	"fmt"
+	"./command"
+	"log"
 )
 
 func main() {
@@ -34,6 +36,15 @@ func parseFlags() {
 			runCommand.PrintDefaults()
 			os.Exit(0)
 		}
-
+		commandModule := os.Args[2]
+		if len(os.Args) == 3 {
+			cmdTmpl, err := command.Loadf(commandModule)
+			if err != nil {
+				log.Fatal("error: ", err)
+			}
+			cmdTmpl.PrintUsage()
+		} else {
+			runCommand.Parse(os.Args[3:])
+		}
 	}
 }

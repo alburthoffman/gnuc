@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"encoding/json"
+	"fmt"
 )
 
 type Tmpl struct {
@@ -24,4 +25,8 @@ func Loadf(tmplfile string) (t *Tmpl, err error)  {
 	err = json.Unmarshal(content, &tmpl)
 
 	return &tmpl, err
+}
+
+func (t *Tmpl) PrintUsage()  {
+	fmt.Printf("Usage: %s\nExample:%s\n", t.Metadata["usage"], t.Metadata["example"])
 }
