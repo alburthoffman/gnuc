@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"io/ioutil"
+	"strings"
 )
 
 type HttpResponse struct {
@@ -15,10 +16,19 @@ type HttpResponse struct {
 
 func Get(url string) (hr *HttpResponse) {
 	client := getHttpClient()
-
 	resp, err := client.Get(url)
-	defer resp.Body.Close()
+	if err == nil {
+		defer resp.Body.Close()
+	}
+	return getHttpResponse(resp, err)
+}
 
+func Post(url string, contentType string, body string) (hr *HttpResponse)  {
+	client := getHttpClient()
+	resp, err := client.Post(url, contentType, strings.NewReader(body))
+	if err == nil {
+		defer resp.Body.Close()
+	}
 	return getHttpResponse(resp, err)
 }
 
