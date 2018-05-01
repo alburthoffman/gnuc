@@ -7,14 +7,36 @@ import (
 	"./command"
 	"log"
 	"strings"
+	"io/ioutil"
 )
 
 func main() {
-	parseFlags()
+	opts := parseFlags()
+	log.Print(opts)
+
+	hosts := strings.Split(opts["hostStr"].(string), ",")
+	hostFile := opts["hostFile"].(string)
+	if hostFile != "" {
+		content, err := ioutil.ReadFile(hostFile)
+		if err != nil {
+			log.Fatal("could not read hosts from file")
+		}
+		if len(content) > 0 {
+			hostsFromFile := strings.Split(string(content), "\n")
+			hosts = append(hosts, hostsFromFile...)
+		}
+	}
+	log.Printf("found %d hosts.", len(hosts))
+
+	
 }
 
-func parseFlags() {
+func parseFlags() (opts map[string]interface{}) {
+	options := map[string]interface{}{}
+
 	runCommand := flag.NewFlagSet("run", flag.ExitOnError)
+	hostStr := runCommand.String("h", "", "hosts seperated by ,")
+	hostFile := runCommand.String("f", "", "/path/to/host/file")
 
 	if len(os.Args) < 2 {
 		fmt.Printf("Usage: gnuc help|run|create")
@@ -38,16 +60,17 @@ func parseFlags() {
 			os.Exit(0)
 		}
 		commandModule := os.Args[2]
-		if len(os.Args) == 3 {
-			pwd, err := os.Getwd()
-			if err != nil {
-				log.Fatal("fail to get current working directory.")
-			}
 
-			tmplFile := strings.Replace(commandModule, ".", string(os.PathSeparator), 1)
-			tmplFile = strings.Join([]string{pwd, tmplFile}, string(os.PathSeparator))
-			tmplFile = strings.Join([]string{tmplFile, ".json"}, "")
-			log.Printf("using command file: %s", tmplFile)
+		pwd, err := os.Getwd()
+		if err != nil {
+			log.Fatal("fail to get current working directory.")
+		}
+		tmplFile := strings.Replace(commandModule, ".", string(os.PathSeparator), 1)
+		tmplFile = strings.Join([]string{pwd, tmplFile}, string(os.PathSeparator))
+		tmplFile = strings.Join([]string{tmplFile, ".json"}, "")
+		options["tmplFile"] = tmplFile
+		log.Printf("using command file: %s", tmplFile)
+		if len(os.Args) == 3 {
 			cmdTmpl, err := command.Loadf(tmplFile)
 			if err != nil {
 				log.Fatal("error: ", err)
@@ -55,6 +78,15 @@ func parseFlags() {
 			cmdTmpl.PrintUsage()
 		} else {
 			runCommand.Parse(os.Args[3:])
+			if len(*hostStr) <= 0 && len(*hostFile) <= 0 {
+				log.Fatal("-h or -f must be provided.")
+			}
+
+			options["hostStr"] = *hostStr
+			options["hostFile"] = *hostFile
+
 		}
 	}
+
+	return options
 }
