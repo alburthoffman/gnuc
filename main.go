@@ -91,6 +91,7 @@ func parseFlags() (opts map[string]interface{}) {
 				log.Fatal("error: ", err)
 			}
 			cmdTmpl.PrintUsage()
+			os.Exit(1)
 		} else {
 			runCommand.Parse(os.Args[3:])
 			if len(*hostStr) <= 0 && len(*hostFile) <= 0 {
