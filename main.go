@@ -14,13 +14,15 @@ func main() {
 	opts := parseFlags()
 	log.Print(opts)
 
-	hosts := []string{}
-	if len(strings.TrimSpace(opts["hostStr"].(string))) > 0 {
-		hostsFromStr := strings.Split(opts["hostStr"].(string), ",")
+	getHosts(opts["hostStr"].(string), opts["hostFile"].(string))
+}
+
+func getHosts(hostStr string, hostFile string) (hosts []string) {
+	hosts = []string{}
+	if len(strings.TrimSpace(hostStr)) > 0 {
+		hostsFromStr := strings.Split(hostStr, ",")
 		hosts = append(hosts, hostsFromStr...)
 	}
-
-	hostFile := opts["hostFile"].(string)
 	if hostFile != "" {
 		content, err := ioutil.ReadFile(hostFile)
 		if err != nil {
@@ -40,6 +42,8 @@ func main() {
 		}
 	}
 	log.Printf("found %d hosts.", len(hosts))
+
+	return hosts
 }
 
 func parseFlags() (opts map[string]interface{}) {
