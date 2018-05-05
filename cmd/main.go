@@ -85,11 +85,12 @@ func parseFlags() (opts map[string]interface{}) {
 		tmplFile = strings.Join([]string{tmplFile, ".json"}, "")
 		options["tmplFile"] = tmplFile
 		log.Printf("using command file: %s", tmplFile)
+		cmdTmpl, err := command.Loadf(tmplFile)
+		if err != nil {
+			log.Fatal("error: ", err)
+		}
+
 		if len(os.Args) == 3 {
-			cmdTmpl, err := command.Loadf(tmplFile)
-			if err != nil {
-				log.Fatal("error: ", err)
-			}
 			cmdTmpl.PrintUsage()
 			os.Exit(1)
 		} else {
@@ -124,6 +125,7 @@ func parseFlags() (opts map[string]interface{}) {
 				}
 			}
 			options["@vars"] = varMap
+			options["@command"] = cmdTmpl
 		}
 	}
 
