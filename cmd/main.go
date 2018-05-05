@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 	"fmt"
-	"./command"
+	"../internal/command"
 	"log"
 	"strings"
 	"io/ioutil"
@@ -100,7 +100,7 @@ func parseFlags() (opts map[string]interface{}) {
 					break
 				}
 			}
-			
+
 			runCommand.Parse(os.Args[3:varIndex])
 			if len(*hostStr) <= 0 && len(*hostFile) <= 0 {
 				log.Fatal("-h or -f must be provided.")
