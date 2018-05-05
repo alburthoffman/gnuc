@@ -8,6 +8,7 @@ import (
 	"log"
 	"strings"
 	"io/ioutil"
+	"../internal/http"
 )
 
 func main() {
@@ -16,7 +17,44 @@ func main() {
 
 	hosts := getHosts(opts["hostStr"].(string), opts["hostFile"].(string))
 
+    parallel := opts["parallel"].(int)
+    if parallel == 0 {
+    	parallel = len(hosts)
+	}
 
+	tasks := make(chan map[string]interface{}, len(hosts))
+	outputs := make(chan http.HttpResponse, len(hosts))
+
+	for index := 0; index < parallel; index++ {
+		go func() {
+			taskMap := <-tasks
+			log.Print(taskMap["host"].(string))
+			outputs <- nil
+		}();
+	}
+
+	go func(parallel int, hosts []string, tmpl command.Tmpl) {
+		for _, host := range hosts {
+			taskMap := map[string]interface{}
+			taskMap["host"] = host
+			taskMap["tmpl"] = tmpl
+			tasks <- taskMap
+		}
+
+		for index := 0; index < parallel; index++ {
+			tasks <- nil
+		}
+	}(parallel, hosts, opts["cmdTmpl"].(command.Tmpl));
+
+	for index := 0; index < parallel; {
+		httpResponse := <- outputs
+		if httpResponse == http.HttpResponse.nil {
+			index++
+			continue
+		}
+
+		log.Print(httpResponse)
+	}
 }
 
 func getHosts(hostStr string, hostFile string) (hosts []string) {
@@ -52,6 +90,7 @@ func parseFlags() (opts map[string]interface{}) {
 	options := map[string]interface{}{}
 
 	runCommand := flag.NewFlagSet("run", flag.ExitOnError)
+	parallel := runCommand.Int("p", 200, "concurrent execution number")
 	hostStr := runCommand.String("h", "", "hosts seperated by ,")
 	hostFile := runCommand.String("f", "", "/path/to/host/file")
 
@@ -109,6 +148,7 @@ func parseFlags() (opts map[string]interface{}) {
 				log.Fatal("-h or -f must be provided.")
 			}
 
+			options["parallel"] = *parallel
 			options["hostStr"] = *hostStr
 			options["hostFile"] = *hostFile
 			varMap := map[string]string{}
