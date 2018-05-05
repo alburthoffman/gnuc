@@ -93,13 +93,37 @@ func parseFlags() (opts map[string]interface{}) {
 			cmdTmpl.PrintUsage()
 			os.Exit(1)
 		} else {
-			runCommand.Parse(os.Args[3:])
+			varIndex := 0
+			for ;varIndex < len(os.Args); varIndex++ {
+				varArg := os.Args[varIndex]
+				if varArg[0:2] == "--" {
+					break
+				}
+			}
+			
+			runCommand.Parse(os.Args[3:varIndex])
 			if len(*hostStr) <= 0 && len(*hostFile) <= 0 {
 				log.Fatal("-h or -f must be provided.")
 			}
 
 			options["hostStr"] = *hostStr
 			options["hostFile"] = *hostFile
+			varMap := map[string]string{}
+			if varIndex < len(os.Args) {
+				otherArgs := os.Args[varIndex:]
+				for index := 0; index < len(otherArgs); index += 1 {
+					oKey := otherArgs[index]
+					if oKey[0:1] == "--" {
+						oKey = oKey[2:]
+					} else {
+						//continue
+					}
+					oVal := otherArgs[index+1]
+					varMap[oKey] = oVal
+					index += 1
+				}
+			}
+			options["@vars"] = varMap
 		}
 	}
 
