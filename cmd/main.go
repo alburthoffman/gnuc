@@ -14,7 +14,9 @@ func main() {
 	opts := parseFlags()
 	log.Print(opts)
 
-	getHosts(opts["hostStr"].(string), opts["hostFile"].(string))
+	hosts := getHosts(opts["hostStr"].(string), opts["hostFile"].(string))
+
+
 }
 
 func getHosts(hostStr string, hostFile string) (hosts []string) {

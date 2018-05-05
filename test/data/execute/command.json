@@ -1,7 +1,7 @@
 {
   "metadata": {
     "usage": "execute command in given host\n",
-    "example": "gnuc run execute.command -h host1,host2 -f hostfile -Dparams=\"pwd\" -Otimeout=20"
+    "example": "gnuc run execute.command -h host1,host2 -f hostfile --params=\"pwd\" --timeout=20"
   },
   "defaults": {
     "params": "pwd"
