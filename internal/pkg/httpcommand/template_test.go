@@ -1,4 +1,4 @@
-package http
+package httpcommand
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestExecuteCommand(t *testing.T)  {
-	cmdtmpl, err := Loadf("C:\\Users\\hoffman\\Documents\\GitHub\\gnuc\\execute\\command.json")
+	cmdtmpl, err := Loadf("test_command.json")
 
 	if err != nil {
 		t.Error("could not read the template file.")

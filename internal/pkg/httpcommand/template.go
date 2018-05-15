@@ -1,4 +1,4 @@
-package http
+package httpcommand
 
 import (
 	"io/ioutil"

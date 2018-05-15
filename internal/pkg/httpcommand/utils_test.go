@@ -1,4 +1,4 @@
-package http
+package httpcommand
 
 import (
 	"testing"
@@ -43,7 +43,7 @@ func TestGet(t *testing.T) {
 	httpResponse := Get(bingUrl)
 
 	if httpResponse.httpStatus != 200 {
-		t.Errorf("http status should be 200, while it is %d", httpResponse.httpStatus)
+		t.Errorf("httpcommand status should be 200, while it is %d", httpResponse.httpStatus)
 	}
 
 	if httpResponse.content != "api server for testing." {
@@ -65,7 +65,7 @@ func TestPost(t *testing.T) {
 	httpResponse := Post(bingUrl, "application/json", "")
 
 	if httpResponse.httpStatus != 200 {
-		t.Errorf("http status should be 200, while it is %d", httpResponse.httpStatus)
+		t.Errorf("httpcommand status should be 200, while it is %d", httpResponse.httpStatus)
 	}
 
 	if httpResponse.content != "post success" {

@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 	"io/ioutil"
-	"../internal/pkg/http"
+	"../internal/pkg/httpcommand"
 )
 
 func main() {
@@ -22,17 +22,17 @@ func main() {
 	}
 
 	tasks := make(chan map[string]interface{}, len(hosts))
-	outputs := make(chan http.HttpResponse, len(hosts))
+	outputs := make(chan httpcommand.HttpResponse, len(hosts))
 
 	for index := 0; index < parallel; index++ {
 		go func() {
 			taskMap := <-tasks
 			log.Print(taskMap["host"].(string))
-			outputs <- nil
+			outputs <- httpcommand.HttpResponse.nil
 		}();
 	}
 
-	go func(parallel int, hosts []string, tmpl command.Tmpl) {
+	go func(parallel int, hosts []string, tmpl httpcommand.Tmpl) {
 		for _, host := range hosts {
 			taskMap := map[string]interface{}
 			taskMap["host"] = host
@@ -43,11 +43,11 @@ func main() {
 		for index := 0; index < parallel; index++ {
 			tasks <- nil
 		}
-	}(parallel, hosts, opts["cmdTmpl"].(command.Tmpl));
+	}(parallel, hosts, opts["cmdTmpl"].(httpcommand.Tmpl));
 
 	for index := 0; index < parallel; {
 		httpResponse := <- outputs
-		if httpResponse == http.HttpResponse.nil {
+		if httpResponse == httpcommand.HttpResponse.nil {
 			index++
 			continue
 		}
@@ -125,7 +125,7 @@ func parseFlags() (opts map[string]interface{}) {
 		tmplFile = strings.Join([]string{tmplFile, ".json"}, "")
 		options["tmplFile"] = tmplFile
 		log.Printf("using command file: %s", tmplFile)
-		cmdTmpl, err := command.Loadf(tmplFile)
+		cmdTmpl, err := httpcommand.Loadf(tmplFile)
 		if err != nil {
 			log.Fatal("error: ", err)
 		}
