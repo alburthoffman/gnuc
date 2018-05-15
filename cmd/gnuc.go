@@ -4,11 +4,10 @@ import (
 	"flag"
 	"os"
 	"fmt"
-	"../internal/command"
 	"log"
 	"strings"
 	"io/ioutil"
-	"../internal/http"
+	"../internal/pkg/http"
 )
 
 func main() {
