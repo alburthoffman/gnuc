@@ -21,39 +21,34 @@ func main() {
     	parallel = len(hosts)
 	}
 
-	tasks := make(chan map[string]interface{}, len(hosts))
+	tasks := make(chan Request, len(hosts))
 	outputs := make(chan httpcommand.HttpResponse, len(hosts))
 
 	for index := 0; index < parallel; index++ {
 		go func() {
 			taskMap := <-tasks
-			log.Print(taskMap["host"].(string))
-			outputs <- httpcommand.HttpResponse.nil
+			log.Print(taskMap.host)
+			httpResp := httpcommand.Get(taskMap.host)
+			outputs <- *httpResp
 		}();
 	}
 
-	go func(parallel int, hosts []string, tmpl httpcommand.Tmpl) {
+	go func(parallel int, hosts []string, tmpl *httpcommand.Tmpl) {
 		for _, host := range hosts {
-			taskMap := map[string]interface{}
-			taskMap["host"] = host
-			taskMap["tmpl"] = tmpl
+			taskMap := Request{host:host, template:*tmpl}
 			tasks <- taskMap
 		}
+	}(parallel, hosts, opts["@command"].(*httpcommand.Tmpl));
 
-		for index := 0; index < parallel; index++ {
-			tasks <- nil
-		}
-	}(parallel, hosts, opts["cmdTmpl"].(httpcommand.Tmpl));
-
-	for index := 0; index < parallel; {
+	for index := 0; index < len(hosts); index++ {
 		httpResponse := <- outputs
-		if httpResponse == httpcommand.HttpResponse.nil {
-			index++
-			continue
-		}
-
 		log.Print(httpResponse)
 	}
+}
+
+type Request struct {
+	host string
+	template httpcommand.Tmpl
 }
 
 func getHosts(hostStr string, hostFile string) (hosts []string) {
